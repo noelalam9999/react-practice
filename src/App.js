@@ -1,25 +1,60 @@
-import logo from './logo.svg';
-import './App.css';
-
+import axios from 'axios';
+import { useState, useEffect } from 'react';
+import { Form } from './Components/Form';
+import { TopicComponent } from './Components/TopicComponent';
 function App() {
+
+  const apiUrl = 'http://localhost:3030';
+
+  const [List, setList] = useState([]);
+  const [Topic, setTopic] = useState({})
+
+  useEffect(()=>{fetchTopics()},[]);
+ 
+  async function fetchTopics(){
+    let discoverData = await fetch(`${apiUrl}/topics`);
+    let discoverJson = await discoverData.json();
+    setList(discoverJson);
+  } 
+
+  useEffect(()=>{fetchTopics()},[List]);
+
+
+  
+    const handleSubmit = (e) => {
+
+    e.preventDefault()
+        axios
+        .post(`${apiUrl}/topics`,Topic)
+        .then((res)=>{
+          console.log("successfully posted")
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+
+  } 
+
+  const topicList = List.map((topic,key)=>{
+
+    return (
+    <>
+      <TopicComponent topic={topic}/>
+    </>
+    )
+  })
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+    <div>
+      <Form Topic={Topic} setTopic={setTopic} handleSubmit={handleSubmit}/> 
+      
+     
+            {topicList}
+      </div>
+    </>
+  )
 }
 
 export default App;
